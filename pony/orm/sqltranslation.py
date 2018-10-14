@@ -4,6 +4,7 @@ from pony.py23compat import PY2, items_list, izip, xrange, basestring, unicode, 
 import types, sys, re, itertools, inspect
 from decimal import Decimal
 from datetime import date, time, datetime, timedelta
+from enum import Enum
 from random import random
 from copy import deepcopy
 from functools import update_wrapper
@@ -1677,6 +1678,9 @@ class BufferMixin(MonadMixin):
 class UuidMixin(MonadMixin):
     pass
 
+class EnumMixin(MonadMixin):
+    pass
+
 _binop_errmsg = 'Unsupported operand types %r and %r for operation %r in expression: {EXPR}'
 
 def make_numeric_binop(op, sqlop):
@@ -2147,6 +2151,7 @@ class AttrMonad(Monad):
         elif t is UUID: cls = UuidAttrMonad
         elif t is Json: cls = JsonAttrMonad
         elif isinstance(t, EntityMeta): cls = ObjectAttrMonad
+        elif issubclass(t, Enum): cls = EnumAttrMonad
         elif isinstance(t, type) and issubclass(t, Array): cls = ArrayAttrMonad
         else: throw(NotImplementedError, t)  # pragma: no cover
         return cls(parent, attr, *args, **kwargs)
@@ -2202,6 +2207,7 @@ class BufferAttrMonad(BufferMixin, AttrMonad): pass
 class UuidAttrMonad(UuidMixin, AttrMonad): pass
 class JsonAttrMonad(JsonMixin, AttrMonad): pass
 class ArrayAttrMonad(ArrayMixin, AttrMonad): pass
+class EnumAttrMonad(EnumMixin, AttrMonad): pass
 
 class ParamMonad(Monad):
     @staticmethod
@@ -2218,6 +2224,7 @@ class ParamMonad(Monad):
         elif t is Json: cls = JsonParamMonad
         elif isinstance(t, type) and issubclass(t, Array): cls = ArrayParamMonad
         elif isinstance(t, EntityMeta): cls = ObjectParamMonad
+        elif issubclass(t, Enum): cls = EnumParamMonad
         else: throw(NotImplementedError, 'Parameter {EXPR} has unsupported type %r' % (t,))
         result = cls(t, paramkey)
         result.aggregated = False
@@ -2259,6 +2266,7 @@ class TimedeltaParamMonad(TimedeltaMixin, ParamMonad): pass
 class DatetimeParamMonad(DatetimeMixin, ParamMonad): pass
 class BufferParamMonad(BufferMixin, ParamMonad): pass
 class UuidParamMonad(UuidMixin, ParamMonad): pass
+class EnumParamMonad(EnumMixin, ParamMonad): pass
 
 class ArrayParamMonad(ArrayMixin, ParamMonad):
     def __init__(monad, t, paramkey, list_monad=None):

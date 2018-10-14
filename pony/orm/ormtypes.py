@@ -194,6 +194,7 @@ def normalize_type(t):
         return t
     assert t.__name__ != 'EntityMeta'
     if tt.__name__ == 'EntityMeta': return t
+    if tt.__name__ == 'EnumMeta': return t
     if t is NoneType: return t
     t = type_normalization_dict.get(t, t)
     if t in primitive_types: return t
@@ -261,6 +262,8 @@ def are_comparable_types(t1, t2, op='=='):
             return False
         if tt1.__name__ == tt2.__name__ == 'EntityMeta':
             return t1._root_ is t2._root_
+        if tt1.__name__ == tt2.__name__ == 'EnumMeta':
+            return t1.__name__ == t2.__name__
         return False
     if t1 is t2 and t1 in comparable_types: return True
     return (t1, t2) in coercions

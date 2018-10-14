@@ -120,6 +120,9 @@ if __name__ == "__main__":
             'contextlib2'
         ])
 
+    if pv in ((2, 7), (3, 3)):
+        REQUIRES.append('enum34')
+
     setup(
         name=name,
         version=version,
