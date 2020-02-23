@@ -350,7 +350,8 @@ class TestDeps2(unittest.TestCase):
 
         db.generate_mapping(create_tables=False, check_tables=False)
 
-        command.migrate(db, 'make -v'); command.migrate(db, 'apply -v')
+        command.migrate(db, 'make -v')
+        command.migrate(db, 'apply -v')
 
 
 
@@ -1049,3 +1050,54 @@ class TestMakeOptional(unittest.TestCase):
         command.migrate(db, 'make -v'); command.migrate(db, 'apply -v')
 
         assert len(glob('migrations/*')) == 2
+
+
+class TestInheritanceAndgein(unittest.TestCase):
+    include_fixtures = {
+        'class': ['migration_dir', 'db']
+    }
+    exclude_fixtures = {
+        'test': ['migration_dir', 'db']
+    }
+
+    def test0(self):
+        db_args, db_kwargs = self.db_params
+
+        db = orm.Database(*db_args, **db_kwargs)
+
+        class Test(db.Entity):
+            field = orm.Required(str)
+
+        command.migrate(db, "make -v")
+        with open("migrations/0001_initial.py") as f:
+            print(f.read())
+        command.migrate(db, "apply -v")
+
+
+    def test1(self):
+        db_args, db_kwargs = self.db_params
+
+        db = orm.Database(*db_args, **db_kwargs)
+
+        class Test(db.Entity):
+            field = orm.Required(str)
+
+        class Parent(db.Entity):
+            _discriminator_ = 1
+            type_field = orm.Discriminator(int)
+            field = orm.Required(str)
+
+            orm.composite_index(type_field, field)
+
+        class Child(Parent):
+            _discriminator_ = 2
+            another_field = orm.Required(str)
+
+            orm.composite_index("type_field", another_field)
+
+        command.migrate(db, "make -v")
+        command.migrate(db, "apply -v")
+
+        with orm.db_session():
+            Parent(field="abcdef")
+            Child(field="qwerty", another_field="1234")
