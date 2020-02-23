@@ -55,6 +55,10 @@ class RenameEntity(Operation):
         db._rename_entity_(op.old_name, op.new_name)
 
 def _clone_attr(attr):
+    # Patch by andgein. Process some base types. It's useful for defining non-attribute entity options in migrations
+    # (such as _table_, _discriminator_, _indexes_ etc).
+    if type(attr) in (int, str, dict, list):
+        return attr
     new_attr = object.__new__(attr.__class__)
     for cls in attr.__class__.__mro__:
         for slot in getattr(cls, '__slots__', ()):

@@ -211,6 +211,26 @@ class MigrationWriter(object):
         for ename, attrs in sorted(eadded.items(), key=lambda x: entities[x[0]]._id_):
             bases = [c.__name__ for c in entities[ename].__bases__]
             regular = [(k, v) for k, v in attrs if not v.reverse]
+
+            # Patch by andgein. Add _table_, _discriminator_ and _table_options_ fields to entity attributes
+            # TODO: add composite_index, composite_key, PrimaryKey here?
+            special_fields = ["_table_", "_discriminator_", "_table_options_"]
+            # Some special fields can't been redefined in child entity
+            special_fields_blocked_in_child = ["_table_", "_table_options_"]
+
+            entity = self.db.entities[ename]
+            for field in special_fields:
+                is_child = len(entity._all_bases_) > 0
+                if is_child and field in special_fields_blocked_in_child:
+                    continue
+                field_value = getattr(entity, field, None)
+                if field_value is not None:
+                    regular.append((field, field_value))
+
+            self_indexes = [index for index in entity._indexes_ if index.entity == entity]
+            regular.append(("_indexes_", self_indexes))
+            # End of patch by andgein
+
             result.append(
                 ops.AddEntity(ename, bases, regular)
             )

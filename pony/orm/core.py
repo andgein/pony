@@ -2749,6 +2749,7 @@ class Discriminator(Required):
     def update_reverse(attr, obj, old_val, new_val, undo_funcs):
         assert False  # pragma: no cover
 
+
 class Index(object):
     __slots__ = 'entity', 'attrs', 'is_pk', 'is_unique', 'name'
     def __init__(index, *attrs, **options):
@@ -2803,6 +2804,15 @@ class Index(object):
             assert attr.columns, attr
             result.extend(attr.columns)
         return tuple(result)
+
+    def __str__(self):
+        return "Index:{}-{}[{!r}, pk={!r}, unique={!r}]".format(
+            self.entity.__name__, self.name, self.attrs, self.is_pk, self.is_unique
+        )
+
+    def __repr__(self):
+        return str(self)
+
 
 def _define_index(func_name, attrs, is_unique=False):
     if len(attrs) < 2: throw(TypeError,

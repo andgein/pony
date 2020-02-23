@@ -136,6 +136,16 @@ class Serializer(object):
         meta, name, bases, cls_dict = entity.deconstruct()
         return 'db.%s' % name if self.initial_migration else repr(name)
 
+    def serialize_index(self, index):
+        self.imports.add('from pony.orm import core')
+        attr_names = [attr.name for attr in index.attrs]
+        attr_options = {
+            "name": index.name,
+            "is_pk": index.is_pk,
+            "is_unique": index.is_unique,
+        }
+        return "core.Index(*{!r}, **{!r})".format(attr_names, attr_options)
+
     def serialize_entity_declaration(self, entity):
         meta, name, bases, cls_dict = entity.deconstruct()
         _bases = []
@@ -205,6 +215,8 @@ class Serializer(object):
             return self.serialize_deconstructable(value)
         if isinstance(value, core.EntityMeta):
             return self.serialize_entity(value)
+        if isinstance(value, core.Index):
+            return self.serialize_index(value)
         if isinstance(value, type):
             return self.serialize_type(value)
         # Anything that knows how to deconstruct itself.
