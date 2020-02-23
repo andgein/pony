@@ -1,3 +1,12 @@
+#### About this fork
+
+This fork contains some not yet merged features of Pony ORM. Be careful while using it.
+
+Changes against github.com/ponyorm/pony:
+* Support of ORM migrations: branch `orm-migrations` of original repository is merged
+* Support of enums (https://github.com/ponyorm/pony/pull/392)
+* Support of inheritance, `_table_` options and indecies in migrations: https://github.com/andgein/pony/tree/support-table-options-and-indecies-in-migrations
+
 Pony Object-Relational Mapper
 =============================
 
