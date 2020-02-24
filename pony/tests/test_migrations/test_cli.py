@@ -1093,7 +1093,7 @@ class TestInheritanceAndgein(unittest.TestCase):
             _discriminator_ = 2
             another_field = orm.Required(str)
 
-            orm.composite_index("type_field", another_field)
+            orm.composite_key("type_field", another_field)
 
         command.migrate(db, "make -v")
         command.migrate(db, "apply -v")

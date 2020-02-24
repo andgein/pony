@@ -212,10 +212,9 @@ class MigrationWriter(object):
             bases = [c.__name__ for c in entities[ename].__bases__]
             regular = [(k, v) for k, v in attrs if not v.reverse]
 
-            # Patch by andgein. Add _table_, _discriminator_ and _table_options_ fields to entity attributes
-            # TODO: add composite_index, composite_key, PrimaryKey here?
+            # Patch by andgein. Add _table_, _discriminator_ and _table_options_ fields to entity attributes.
             special_fields = ["_table_", "_discriminator_", "_table_options_"]
-            # Some special fields can't been redefined in child entity
+            # Some special fields can't been redefined in child entity.
             special_fields_blocked_in_child = ["_table_", "_table_options_"]
 
             entity = self.db.entities[ename]
@@ -227,8 +226,9 @@ class MigrationWriter(object):
                 if field_value is not None:
                     regular.append((field, field_value))
 
-            self_indexes = [index for index in entity._indexes_ if index.entity == entity]
-            regular.append(("_indexes_", self_indexes))
+            own_indexes = [index for index in entity._indexes_ if index.entity == entity]
+            composite_indexes = [index for index in own_indexes if len(index.attrs) > 1 and not index.is_pk]
+            regular.append(("_indexes_", list(set(own_indexes) - set(composite_indexes))))
             # End of patch by andgein
 
             result.append(
@@ -257,6 +257,14 @@ class MigrationWriter(object):
                     result.append(ops.AddRelation(
                         ename, name(attr), attr, name(attr.reverse), attr.reverse
                     ))
+
+            # Patch by andgein. Composite indices should be added after relations
+            for index in composite_indexes:
+                result.append(
+                    ops.AddIndex(ename, [attr.name for attr in index.attrs], index.name, index.is_unique)
+                )
+            # End of patch
+
         for ename, attrs in sorted(eremoved.items()):
             result.append(
                 ops.RemoveEntity(ename)

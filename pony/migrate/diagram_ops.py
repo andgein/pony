@@ -164,6 +164,19 @@ class ModifyRelation(Operation):
         #                        op.reverse_name, _clone_attr(op.reverse_attr))
 
 
+class AddIndex(Operation):
+    def __init__(self, entity_name, attrs, name, is_unique, **kwargs):
+        Operation.__init__(self, **kwargs)
+        self.entity_name = entity_name
+        self.attrs = attrs
+        self.name = name
+        self.is_unique = is_unique
+
+    def apply(self, db):
+        entity = db.entities[self.entity_name]
+        attrs = [entity._adict_[attr_name] for attr_name in self.attrs]
+        entity._add_index_(attrs, self.name, self.is_unique)
+
 class Custom(Operation):
     is_custom = True
 
