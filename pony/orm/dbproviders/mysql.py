@@ -4,7 +4,7 @@ from pony.py23compat import PY2, imap, basestring, buffer, int_types
 import json
 from decimal import Decimal
 from datetime import datetime, date, time, timedelta
-from enum import Enum
+from enum import Enum, IntEnum
 from uuid import UUID
 
 NoneType = type(None)
@@ -273,7 +273,8 @@ class MySQLProvider(DBAPIProvider):
         (UUID, MySQLUuidConverter),
         (buffer, MySQLBlobConverter),
         (ormtypes.Json, MySQLJsonConverter),
-        (Enum, dbapiprovider.EnumConverter)
+        (Enum, dbapiprovider.EnumConverter),
+        (IntEnum, dbapiprovider.IntEnumConverter)
     ]
 
     @wrap_dbapi_exceptions
