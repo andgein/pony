@@ -4,7 +4,7 @@ This fork contains some not yet merged features of Pony ORM. Be careful while us
 
 Changes against github.com/ponyorm/pony:
 * Support of ORM migrations: branch `orm-migrations` of original repository is merged
-* Support of enums (https://github.com/ponyorm/pony/pull/392)
+* Support of enums (https://github.com/ponyorm/pony/pull/392) with added support for IntEnum, which are stored int database as int, not as strings (see `enum` branch or commit 3098977f)
 * Support of inheritance, `_table_` options and indecies in migrations: https://github.com/andgein/pony/tree/support-table-options-and-indecies-in-migrations
 
 Pony Object-Relational Mapper
