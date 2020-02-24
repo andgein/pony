@@ -4230,6 +4230,10 @@ class EntityMeta(type):
         if schema is None: return
         m2m_table = schema.tables[m2m_table_name]
         m2m_table.remove()
+
+    def _add_index_(entity, attrs, name, is_unique):
+        entity._indexes_.append(Index(*attrs, name=name, is_unique=is_unique))
+
     def _erase_bits_(entity):
         entity._bits_ = entity._bits_except_volatile_ = entity._all_bits_ = entity._all_bits_except_volatile_ = None
         entity._offset_counter_ = 0
