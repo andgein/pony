@@ -5,7 +5,7 @@ import os.path, sys, re, json
 import sqlite3 as sqlite
 from decimal import Decimal
 from datetime import datetime, date, time, timedelta
-from enum import Enum
+from enum import Enum, IntEnum
 from random import random
 from time import strptime
 from threading import Lock
@@ -260,7 +260,8 @@ class SQLiteProvider(DBAPIProvider):
         (UUID, dbapiprovider.UuidConverter),
         (buffer, dbapiprovider.BlobConverter),
         (Json, SQLiteJsonConverter),
-        (Enum, dbapiprovider.EnumConverter)
+        (Enum, dbapiprovider.EnumConverter),
+        (IntEnum, dbapiprovider.IntEnumConverter)
     ]
 
     def __init__(provider, *args, **kwargs):

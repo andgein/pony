@@ -432,6 +432,17 @@ class EnumConverter(Converter):
     def sql_type(self):
         return 'TEXT'
 
+
+class IntEnumConverter(EnumConverter):
+    def py2sql(self, val):
+        return val.value
+
+    def sql2py(self, val):
+        self.py_type(val)
+
+    def sql_type(self):
+        return 'INTEGER'
+
 class StrConverter(Converter):
     def __init__(converter, provider, py_type, attr=None):
         converter.max_len = None
