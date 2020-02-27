@@ -228,7 +228,10 @@ class MigrationWriter(object):
 
             own_indexes = [index for index in entity._indexes_ if index.entity == entity]
             composite_indexes = [index for index in own_indexes if len(index.attrs) > 1 and not index.is_pk]
-            regular.append(("_indexes_", list(set(own_indexes) - set(composite_indexes))))
+            # Auto_created indices will be created by Pono automatically be entity attribute definition
+            # (orm.PrimaryKey() or orm.Required(..., unique=True) will be used).
+            auto_created_indexes = [index for index in own_indexes if (index.is_unique or index.is_pk) and len(index.attrs) == 1]
+            regular.append(("_indexes_", list(set(own_indexes) - set(composite_indexes) - set(auto_created_indexes))))
             # End of patch by andgein
 
             result.append(
